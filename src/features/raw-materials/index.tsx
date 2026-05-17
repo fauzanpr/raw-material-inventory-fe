@@ -4,12 +4,33 @@ import TableCustomized from "@/components/TableCustomized";
 import { Divider } from "@mui/material";
 import AddEditDialog from "./components/AddEditDialog";
 import { useState } from "react";
+import { useRawMaterialsMutation, useRawMaterialsQuery } from "./hooks/raw-material";
+import { useDebounce } from "@/hooks/debounce";
+import { columns } from "./columns";
+import { RawMaterialMapper } from "./mapper";
+import { GridPaginationModel } from "@mui/x-data-grid";
+import toast from "react-hot-toast";
 
 function RawMaterial() {
+    const [search, setSearch] = useState("");
+    const searchDebounced = useDebounce(search, 500);
+
+    const [pagination, setPagination] = useState<GridPaginationModel>({
+        page: 0,
+        pageSize: 10
+    });
+
     const [dialogState, setDialogState] = useState<{ cond: boolean; data: unknown }>({
         cond: false,
         data: null
     });
+
+    const { data, isFetching, refetch } = useRawMaterialsQuery({
+        search: searchDebounced,
+        page: pagination.page
+    });
+
+    const { mutateAsync, isPending } = useRawMaterialsMutation({});
 
     return (
         <>
@@ -46,9 +67,15 @@ function RawMaterial() {
                         <p className="font-poppins text-lg font-semibold text-primary uppercase">Raw Material Inventory</p>
                         <Divider sx={{ my: 2 }} />
                         <TableCustomized
-                            columns={[]}
-                            rows={[]}
-                            rowsCount={0}
+                            columns={columns}
+                            rows={RawMaterialMapper(data?.content || [])}
+                            rowsCount={data?.size || 0}
+                            onSearch={(value) => setSearch(value)}
+                            loading={isFetching}
+                            pagination={{
+                                paginationModel: pagination,
+                                paginationControl: (newModel) => setPagination(newModel)
+                            }}
                             addProps={{
                                 onAdd: () => {
                                     setDialogState({
@@ -56,6 +83,29 @@ function RawMaterial() {
                                         data: null
                                     });
                                 }
+                            }}
+                            showProps={{
+                                hide: true
+                            }}
+                            deleteProps={{
+                                onDelete: async (id, onClose) => {
+                                    try {
+                                        await mutateAsync({
+                                            method: "DELETE",
+                                            id: id?.toString(),
+                                        });
+
+                                        toast.success("Data berhasil dihapus");
+                                        refetch();
+                                        
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                                        !!onClose ? onClose() : undefined;
+                                    } catch (err) {
+                                        console.log(err);
+                                        toast.error("Terjadi Kesalahan");
+                                    };
+                                },
+                                isPending: isPending
                             }}
                         />
                     </div>

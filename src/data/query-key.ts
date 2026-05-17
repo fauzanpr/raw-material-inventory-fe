@@ -1,0 +1,4 @@
+export const QUERY_KEYS = {
+    CATEGORIES: { INDEX: "CATEGORIES" },
+    RAW_MATERIALS: { INDEX: "RAW_MATERIALS" }
+}

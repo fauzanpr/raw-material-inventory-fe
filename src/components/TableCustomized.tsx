@@ -9,7 +9,7 @@ import Link from 'next/link';
 import type { GridColDef, GridPaginationModel, GridRenderCellParams, GridRowId, GridTreeNodeWithRender } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid'
 
-import { Button, TextField as CustomTextField } from '@mui/material';
+import { Button, TextField as CustomTextField, TextField } from '@mui/material';
 
 import ColumnAction from './columns-components/ColumnAction';
 import DeleteDialog from './dialog/DeleteDialog';
@@ -79,7 +79,8 @@ function TableCustomized({ columns, rows, loading, hideAction, addProps, deleteP
 
                 <div className='flex gap-2'>
                     {!!onSearch ? (
-                        <CustomTextField
+                        <TextField
+                            size='small'
                             placeholder={searchPlaceholder ?? "Search here"}
                             onChange={(e) => onSearch(e.target.value)}
                         />
@@ -88,10 +89,10 @@ function TableCustomized({ columns, rows, loading, hideAction, addProps, deleteP
                     {!addProps?.hide && (
                         addProps?.redirectUrl ? (
                             <Link href={addProps?.redirectUrl}>
-                                <Button variant='contained' startIcon={<i className='tabler-plus'></i>} size='medium'>{addProps?.buttonLabel ? addProps?.buttonLabel : "Tambahkan Data"}</Button>
+                                <Button variant='contained' startIcon={<i className='tabler-plus'></i>} size='small'>{addProps?.buttonLabel ? addProps?.buttonLabel : "Tambahkan Data"}</Button>
                             </Link>
                         ) : (
-                            <Button onClick={addProps?.onAdd} variant='contained' startIcon={<i className='tabler-plus'></i>} size='medium'>{addProps?.buttonLabel ? addProps?.buttonLabel : "Tambahkan Data"}</Button>
+                            <Button onClick={addProps?.onAdd} variant='contained' startIcon={<i className='tabler-plus'></i>} size='small'>{addProps?.buttonLabel ? addProps?.buttonLabel : "Tambahkan Data"}</Button>
                         ))
                     }
                 </div>

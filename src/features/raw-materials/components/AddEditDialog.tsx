@@ -1,16 +1,78 @@
 "use client";
 
-import CustomAutocomplete from "@/components/mui/Autocomplete";
-import { Button, Dialog, DialogContent, Divider, TextField } from "@mui/material";
+import { Button, CircularProgress, Dialog, DialogContent, Divider } from "@mui/material";
+import { useCategoriesQuery } from "../hooks/categories";
+import { useForm } from "react-hook-form";
+import { TAutocomplete } from "@/types/form";
+import InputCustomized from "@/components/InputCustomized";
+import { useRawMaterialsMutation } from "../hooks/raw-material";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/data/query-key";
 
 type TAddEditDialog = {
     open: boolean;
     onClose: () => void;
 }
 
+type TRequest = {
+    code: string;
+    name: string;
+    stock: string;
+    unit: string;
+    description: string;
+    categoryId: TAutocomplete | null;
+}
+
+const defaultValue: TRequest = {
+    categoryId: null,
+    code: "",
+    description: "",
+    name: "",
+    stock: "",
+    unit: ""
+};
+
 function AddEditDialog({ onClose, open }: TAddEditDialog) {
+    const queryClient = useQueryClient();
+
+    const { data, isFetching } = useCategoriesQuery();
+
+    const { mutate, isPending } = useRawMaterialsMutation({
+        onSuccess: () => {
+            toast.success("Data Berhasil Disimpan");
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.RAW_MATERIALS.INDEX]
+            });
+            _onClose();
+        },
+        onError: (err) => {
+            console.log(err);
+            
+            toast.error("Terjadi Kesalahan");
+        }
+    });
+
+    const { control, handleSubmit, reset } = useForm<TRequest>({
+        defaultValues: defaultValue
+    });
+
     const _onClose = () => {
+        reset(defaultValue);
         onClose();
+    }
+
+    const onSubmit = (data: TRequest) => {
+        const payload = {
+            ...data,
+            categoryId: Number(data.categoryId?.value),
+            stock: Number(data?.stock)
+        }
+
+        mutate({
+            method: "POST",
+            data: payload,
+        });
     }
 
     const TITLE = "Tambah Data Raw Material";
@@ -21,43 +83,56 @@ function AddEditDialog({ onClose, open }: TAddEditDialog) {
                 <h2 className="font-poppins font-semibold text-primary">{TITLE}</h2>
                 <Divider sx={{ my: 2 }} />
 
-                <div className="flex flex-col gap-4">
-                    <TextField
-                        size="small"
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                    <InputCustomized
+                        control={control}
+                        name="code"
                         label="Kode"
                     />
 
-                    <TextField
-                        size="small"
+                    <InputCustomized
+                        control={control}
+                        name="name"
                         label="Nama"
                     />
 
-                    <CustomAutocomplete
-                        options={[]}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                size="small"
-                                label="Kategori"
-                            />
-                        )}
+                    <InputCustomized
+                        control={control}
+                        label="Kategori"
+                        name="categoryId"
+                        isSelectInput
+                        selectOption={data?.map(_data => ({
+                            label: _data?.name,
+                            value: _data?.id?.toString()
+                        })) || []}
+                        isOptionLoading={isFetching}
                     />
 
-                    <TextField
-                        size="small"
+                    <InputCustomized
+                        control={control}
+                        name="stock"
                         label="Stok"
                     />
 
-                    <TextField
-                        size="small"
+                    <InputCustomized
+                        control={control}
+                        name="unit"
                         label="Unit"
+                    />
+
+                    <InputCustomized
+                        control={control}
+                        name="description"
+                        label="Deksripsi"
                     />
 
                     <div className="flex gap-2">
                         <Button variant="outlined" onClick={_onClose}>Batal</Button>
-                        <Button variant="contained" sx={{ flex: 1 }}>Simpan</Button>
+                        <Button type="submit" variant="contained" sx={{ flex: 1 }} disabled={isPending}>
+                            { isPending ? <CircularProgress size={18} sx={{ color: "white" }} /> : "Simpan" }
+                        </Button>
                     </div>
-                </div>
+                </form>
             </DialogContent>
         </Dialog>
     )
