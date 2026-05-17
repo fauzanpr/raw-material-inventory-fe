@@ -15,10 +15,14 @@ import { TbEdit } from "react-icons/tb";
 import { ImDownload, ImUpload } from "react-icons/im";
 import StockPatchDialog from "./components/StockPatchDialog";
 import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
+import { resetPermission } from "@/utils/api";
+import { useRouter } from "next/navigation";
+import { APP_URL } from "@/data/url";
 
 function RawMaterial() {
     const [search, setSearch] = useState("");
     const searchDebounced = useDebounce(search, 500);
+    const router = useRouter();
 
     const [pagination, setPagination] = useState<GridPaginationModel>({
         page: 0,
@@ -39,6 +43,12 @@ function RawMaterial() {
         data: null,
         type: "in"
     });
+
+    const onLogout = () => {
+        toast.success("Logout Berhasil");
+        resetPermission();
+        router.push(APP_URL.LOGIN);
+    }
 
     const { data, isFetching, refetch } = useRawMaterialsQuery({
         search: searchDebounced,
@@ -86,7 +96,12 @@ function RawMaterial() {
                         </div>
                     </header>
 
-                    <div className="py-2 px-4 border-t border border-red-100 rounded-md bg-red-50 w-full cursor-pointer transition-all hover:bg-red-100">
+                    <div
+                        onClick={() => {
+                            onLogout();
+                        }}
+                        className="py-2 px-4 border-t border border-red-100 rounded-md bg-red-50 w-full cursor-pointer transition-all hover:bg-red-100"
+                    >
                         <p className="text-red-600 text-sm font-medium font-poppins">Logout</p>
                     </div>
                 </aside>
@@ -172,20 +187,6 @@ function RawMaterial() {
                                         >
                                             <TbEdit className="text-sm text-white" />
                                         </div>
-
-                                        {/* <div onClick={() => setDialogState({
-                                            cond: true,
-                                            data: rowData
-                                        })} className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer">
-                                            <TbEdit className="text-sm text-white" />
-                                        </div>
-
-                                        <div onClick={() => setDialogState({
-                                            cond: true,
-                                            data: rowData
-                                        })} className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer">
-                                            <TbEdit className="text-sm text-white" />
-                                        </div> */}
                                     </div>
                                 )
                             }}
