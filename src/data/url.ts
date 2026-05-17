@@ -8,6 +8,9 @@ export const API_URL = {
     },
     RAW_MATERIAL: {
         INDEX: "/raw-materials",
-        DETAIL: "/raw-materials/:id"
+        DETAIL: "/raw-materials/:id",
+        STOCKIN: "/raw-materials/:id/stock-in",
+        STOCKOUT: "/raw-materials/:id/stock-out",
+        STOCKOPNAME: "/raw-materials/:id/stock-opname",
     }
 }

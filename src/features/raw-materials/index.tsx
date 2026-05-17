@@ -1,7 +1,7 @@
 "use client";
 
 import TableCustomized from "@/components/TableCustomized";
-import { Divider } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import AddEditDialog from "./components/AddEditDialog";
 import { useState } from "react";
 import { useRawMaterialsMutation, useRawMaterialsQuery } from "./hooks/raw-material";
@@ -12,6 +12,9 @@ import { GridPaginationModel } from "@mui/x-data-grid";
 import toast from "react-hot-toast";
 import { TRawMaterials } from "./types/raw-material";
 import { TbEdit } from "react-icons/tb";
+import { ImDownload, ImUpload } from "react-icons/im";
+import StockPatchDialog from "./components/StockPatchDialog";
+import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 
 function RawMaterial() {
     const [search, setSearch] = useState("");
@@ -25,6 +28,16 @@ function RawMaterial() {
     const [dialogState, setDialogState] = useState<{ cond: boolean; data: TRawMaterials | null }>({
         cond: false,
         data: null
+    });
+
+    const [stockPatchDialog, setStockPatchDialog] = useState<{
+        cond: boolean;
+        data: TRawMaterials | null;
+        type: "in" | "out" | "opname"
+    }>({
+        cond: false,
+        data: null,
+        type: "in"
     });
 
     const { data, isFetching, refetch } = useRawMaterialsQuery({
@@ -47,6 +60,19 @@ function RawMaterial() {
                 dataInit={dialogState.data}
             />
 
+            <StockPatchDialog
+                open={stockPatchDialog.cond}
+                data={stockPatchDialog.data}
+                type={stockPatchDialog.type}
+                onClose={() => {
+                    setStockPatchDialog({
+                        cond: false,
+                        data: null,
+                        type: "in"
+                    });
+                }}
+            />
+
             <div className="bg-gray-100 min-h-screen">
                 <aside className="w-64 bg-white fixed left-0 h-full py-8 px-4 flex flex-col justify-between border-r">
                     <header>
@@ -55,7 +81,7 @@ function RawMaterial() {
                             <p className="text-sm text-gray-400 font-poppins">Raw Material Inventory</p>
                         </div>
 
-                        <div className="py-2 px-4 border-l-2 border-t border !border-l-primary rounded-r-md bg-gray-50 w-full">
+                        <div className="py-2 px-4 border-l-4 border-t border !border-l-primary rounded-r-md bg-gray-50 w-full">
                             <p className="text-primary text-sm font-medium font-poppins">Raw Material Inventory</p>
                         </div>
                     </header>
@@ -98,10 +124,52 @@ function RawMaterial() {
 
                                 return (
                                     <div className="flex gap-2">
-                                        <div onClick={() => setDialogState({
-                                            cond: true,
-                                            data: rowData
-                                        })} className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer">
+                                        <Tooltip title="Stock opname">
+                                            <div
+                                                onClick={() => setStockPatchDialog({
+                                                    cond: true,
+                                                    data: rowData,
+                                                    type: "opname",
+                                                })}
+                                                className="bg-yellow-500 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer"
+                                            >
+                                                <HiOutlineClipboardDocumentCheck className="text-sm text-white" />
+                                            </div>
+                                        </Tooltip>
+
+                                        <Tooltip title="Stock out">
+                                            <div
+                                                onClick={() => setStockPatchDialog({
+                                                    cond: true,
+                                                    data: rowData,
+                                                    type: "out",
+                                                })}
+                                                className="bg-orange-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer"
+                                            >
+                                                <ImUpload className="text-sm text-white" />
+                                            </div>
+                                        </Tooltip>
+
+                                        <Tooltip title="Stock in">
+                                            <div
+                                                onClick={() => setStockPatchDialog({
+                                                    cond: true,
+                                                    data: rowData,
+                                                    type: "in",
+                                                })}
+                                                className="bg-green-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer"
+                                            >
+                                                <ImDownload className="text-sm text-white" />
+                                            </div>
+                                        </Tooltip>
+
+                                        <div
+                                            onClick={() => setDialogState({
+                                                cond: true,
+                                                data: rowData
+                                            })}
+                                            className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer"
+                                        >
                                             <TbEdit className="text-sm text-white" />
                                         </div>
 

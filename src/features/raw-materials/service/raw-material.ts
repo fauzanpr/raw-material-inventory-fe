@@ -34,3 +34,28 @@ export const deleteRawMaterial = (id: string) => {
         urlKey: API_URL.RAW_MATERIAL.DETAIL.replace(":id", id),
     });
 }
+
+// stock
+export const patchStockIn = (id: string, data: Record<any,any>) => {
+    return apiRequest({
+        method: "PATCH",
+        urlKey: API_URL.RAW_MATERIAL.STOCKIN.replace(":id", id),
+        data: data
+    });
+}
+
+export const patchStockOut = (id: string, data: Record<any,any>) => {
+    return apiRequest({
+        method: "PATCH",
+        urlKey: API_URL.RAW_MATERIAL.STOCKOUT.replace(":id", id),
+        data: data
+    });
+}
+
+export const patchStockOpname = (id: string, data: Record<any,any>) => {
+    return apiRequest({
+        method: "PATCH",
+        urlKey: API_URL.RAW_MATERIAL.STOCKOPNAME.replace(":id", id),
+        data: data
+    });
+}
