@@ -22,7 +22,7 @@ export const postRawMaterial = (data: Record<any, any>) => {
 
 export const putRawMaterial = (id: string, data: Record<any, any>) => {
     return apiRequest({
-        method: "POST",
+        method: "PUT",
         urlKey: API_URL.RAW_MATERIAL.DETAIL.replace(":id", id),
         data: data
     });

@@ -9,7 +9,7 @@ import Link from 'next/link';
 import type { GridColDef, GridPaginationModel, GridRenderCellParams, GridRowId, GridTreeNodeWithRender } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid'
 
-import { Button, TextField as CustomTextField, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 
 import ColumnAction from './columns-components/ColumnAction';
 import DeleteDialog from './dialog/DeleteDialog';
@@ -40,7 +40,7 @@ type TTableCustomized = {
     editProps?: {
         hide?: boolean;
         redirectUrl?: (id: string) => string;
-        onEdit?: () => void;
+        onEdit?: (data: any) => void;
     };
     showProps?: {
         hide?: boolean;
@@ -103,12 +103,12 @@ function TableCustomized({ columns, rows, loading, hideAction, addProps, deleteP
                         {
                             field: "actions",
                             headerName: "",
-                            minWidth: 120,
+                            minWidth: 200,
                             renderCell: (props) => {
                                 const { id } = props;
 
                                 return (
-                                    <>
+                                    <div className='flex gap-2 items-center h-full'>
                                         {renderActionsTable ? renderActionsTable(props) : null}
                                         <ColumnAction
                                             editProps={{
@@ -131,7 +131,7 @@ function TableCustomized({ columns, rows, loading, hideAction, addProps, deleteP
                                                 url: showProps?.redirectUrl && showProps?.redirectUrl(String(id))
                                             }}
                                         />
-                                    </>
+                                    </div>
                                 )
                             }
                         }

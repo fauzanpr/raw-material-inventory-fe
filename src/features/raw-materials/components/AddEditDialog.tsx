@@ -9,10 +9,13 @@ import { useRawMaterialsMutation } from "../hooks/raw-material";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/data/query-key";
+import { TRawMaterials } from "../types/raw-material";
+import { useEffect } from "react";
 
 type TAddEditDialog = {
     open: boolean;
     onClose: () => void;
+    dataInit: TRawMaterials | null;
 }
 
 type TRequest = {
@@ -33,7 +36,7 @@ const defaultValue: TRequest = {
     unit: ""
 };
 
-function AddEditDialog({ onClose, open }: TAddEditDialog) {
+function AddEditDialog({ onClose, open, dataInit }: TAddEditDialog) {
     const queryClient = useQueryClient();
 
     const { data, isFetching } = useCategoriesQuery();
@@ -48,7 +51,7 @@ function AddEditDialog({ onClose, open }: TAddEditDialog) {
         },
         onError: (err) => {
             console.log(err);
-            
+
             toast.error("Terjadi Kesalahan");
         }
     });
@@ -70,12 +73,29 @@ function AddEditDialog({ onClose, open }: TAddEditDialog) {
         }
 
         mutate({
-            method: "POST",
+            method: !!dataInit ? "PUT" : "POST",
             data: payload,
+            ...(!!dataInit ? { id: dataInit?.id?.toString() } : {})
         });
     }
 
-    const TITLE = "Tambah Data Raw Material";
+    const TITLE = !!dataInit ? "Edit Data Raw Material" : "Tambah Data Raw Material";
+
+    useEffect(() => {
+        if (!!data) {
+            reset({
+                categoryId: dataInit?.category ? ({
+                    label: dataInit?.category?.name,
+                    value: dataInit?.category?.id?.toString()
+                }) : null,
+                code: dataInit?.code,
+                description: dataInit?.description,
+                name: dataInit?.name,
+                stock: dataInit?.stock?.toString(),
+                unit: dataInit?.unit,
+            });
+        }
+    }, [open]);
 
     return (
         <Dialog open={open} onClose={_onClose} fullWidth>
@@ -108,11 +128,13 @@ function AddEditDialog({ onClose, open }: TAddEditDialog) {
                         isOptionLoading={isFetching}
                     />
 
-                    <InputCustomized
-                        control={control}
-                        name="stock"
-                        label="Stok"
-                    />
+                    {!dataInit ? (
+                        <InputCustomized
+                            control={control}
+                            name="stock"
+                            label="Stok"
+                        />
+                    ) : null}
 
                     <InputCustomized
                         control={control}
@@ -129,7 +151,7 @@ function AddEditDialog({ onClose, open }: TAddEditDialog) {
                     <div className="flex gap-2">
                         <Button variant="outlined" onClick={_onClose}>Batal</Button>
                         <Button type="submit" variant="contained" sx={{ flex: 1 }} disabled={isPending}>
-                            { isPending ? <CircularProgress size={18} sx={{ color: "white" }} /> : "Simpan" }
+                            {isPending ? <CircularProgress size={18} sx={{ color: "white" }} /> : "Simpan"}
                         </Button>
                     </div>
                 </form>

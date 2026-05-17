@@ -32,7 +32,7 @@ export const columns: GridColDef[] = [
         minWidth: 250,
     },
     {
-        field: "category",
+        field: "categoryName",
         headerName: "Kategori",
         flex: 1,
         minWidth: 250,

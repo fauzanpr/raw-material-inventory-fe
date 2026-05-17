@@ -10,6 +10,8 @@ import { columns } from "./columns";
 import { RawMaterialMapper } from "./mapper";
 import { GridPaginationModel } from "@mui/x-data-grid";
 import toast from "react-hot-toast";
+import { TRawMaterials } from "./types/raw-material";
+import { TbEdit } from "react-icons/tb";
 
 function RawMaterial() {
     const [search, setSearch] = useState("");
@@ -20,7 +22,7 @@ function RawMaterial() {
         pageSize: 10
     });
 
-    const [dialogState, setDialogState] = useState<{ cond: boolean; data: unknown }>({
+    const [dialogState, setDialogState] = useState<{ cond: boolean; data: TRawMaterials | null }>({
         cond: false,
         data: null
     });
@@ -42,6 +44,7 @@ function RawMaterial() {
                         data: null
                     });
                 }}
+                dataInit={dialogState.data}
             />
 
             <div className="bg-gray-100 min-h-screen">
@@ -84,8 +87,39 @@ function RawMaterial() {
                                     });
                                 }
                             }}
+                            editProps={{
+                                hide: true
+                            }}
                             showProps={{
                                 hide: true
+                            }}
+                            renderActionsTable={({ row }) => {
+                                const rowData = row as ReturnType<typeof RawMaterialMapper>[number];
+
+                                return (
+                                    <div className="flex gap-2">
+                                        <div onClick={() => setDialogState({
+                                            cond: true,
+                                            data: rowData
+                                        })} className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer">
+                                            <TbEdit className="text-sm text-white" />
+                                        </div>
+
+                                        {/* <div onClick={() => setDialogState({
+                                            cond: true,
+                                            data: rowData
+                                        })} className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer">
+                                            <TbEdit className="text-sm text-white" />
+                                        </div>
+
+                                        <div onClick={() => setDialogState({
+                                            cond: true,
+                                            data: rowData
+                                        })} className="bg-blue-600 h-6 w-6 rounded-lg flex items-center justify-center cursor-pointer">
+                                            <TbEdit className="text-sm text-white" />
+                                        </div> */}
+                                    </div>
+                                )
                             }}
                             deleteProps={{
                                 onDelete: async (id, onClose) => {
@@ -97,7 +131,7 @@ function RawMaterial() {
 
                                         toast.success("Data berhasil dihapus");
                                         refetch();
-                                        
+
                                         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                                         !!onClose ? onClose() : undefined;
                                     } catch (err) {
