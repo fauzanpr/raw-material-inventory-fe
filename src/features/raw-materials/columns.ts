@@ -38,7 +38,7 @@ export const columns: GridColDef[] = [
         minWidth: 250,
     },
     {
-        field: "created_by",
+        field: "created_by_data",
         headerName: "Dibuat Oleh",
         flex: 1,
         minWidth: 250,
