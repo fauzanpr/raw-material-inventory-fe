@@ -1,9 +1,47 @@
 "use client";
 
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import { CiLogin } from "react-icons/ci";
+import { useAuthMutation } from "./hooks/auth";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { APP_URL } from "@/data/url";
+import { useForm } from "react-hook-form";
+import InputCustomized from "@/components/InputCustomized";
+
+type TRequest = {
+    email: string;
+    password: string;
+}
 
 function LoginPage() {
+    const router = useRouter();
+
+    const { control, handleSubmit } = useForm<TRequest>({
+        defaultValues: {
+            email: "",
+            password: ""
+        }
+    });
+
+    const { mutate, isPending } = useAuthMutation({
+        onSuccess: (res) => {
+            toast.success("Login berhasil, kamu sedang dialihkan ke halaman utama");
+            localStorage.setItem("access_token", res?.access_token);
+            router.push(APP_URL.RAW_MATERIAL);
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Terjadi Kesalahan");
+        }
+    });
+
+    const onSubmit = (data: TRequest) => {
+        mutate({
+            method: "POST",
+            data: data,
+        });
+    }
+
     return (
         <div
             className="relative w-screen h-screen flex items-center justify-center bg-cover bg-center"
@@ -16,7 +54,10 @@ function LoginPage() {
             <div className="absolute inset-0 bg-black/50" />
 
             {/* Content */}
-            <div className="relative z-10 p-6 bg-white rounded-xl border border-gray-400 shadow-2xl flex flex-col gap-4 w-[450px]">
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="relative z-10 p-6 bg-white rounded-xl border border-gray-400 shadow-2xl flex flex-col gap-4 w-[450px]"
+            >
                 <div className="w-8 h-8 shadow-sm border bg-white/45 rounded-md flex items-center justify-center mx-auto">
                     <CiLogin className="text-2xl" />
                 </div>
@@ -29,18 +70,35 @@ function LoginPage() {
                     <p className="text-gray-500 font-poppins font-light text-sm text-center mt-2">Masuk menggunakan email untuk melakukan management inventory raw material</p>
                 </header>
 
-                <TextField
-                    size="small"
+                <InputCustomized
+                    control={control}
+                    name="email"
                     label="Email"
+                    rules={{
+                        required: {
+                            value: true,
+                            message: "This field is required"
+                        }
+                    }}
                 />
 
-                <TextField
-                    size="small"
+                <InputCustomized
+                    control={control}
+                    name="password"
                     label="Password"
                     type="password"
+                    rules={{
+                        required: {
+                            value: true,
+                            message: "This field is required"
+                        }
+                    }}
                 />
-                <Button variant="contained">Login</Button>
-            </div>
+
+                <Button type="submit" variant="contained" disabled={isPending}>
+                    {isPending ? <CircularProgress size={18} sx={{ color: "white" }} /> : "Login"}
+                </Button>
+            </form>
         </div>
     );
 }

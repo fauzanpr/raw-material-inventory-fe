@@ -45,7 +45,7 @@ export const apiRequest = async <T>({
     }
 
     const getDefaultHeader = () => ({
-        // ...(isWithAuthorization && { Authorization: `Bearer ${token}` }),
+        ...(isWithAuthorization && { Authorization: `Bearer ${token}` }),
         "Content-Type": "application/json",
         ...additionalHeaders
     });
@@ -62,7 +62,7 @@ export const apiRequest = async <T>({
     instance.interceptors.response.use(
         (response) => response,
         (error) => {
-            if (error.response?.status === 401) {
+            if (window.location.pathname !== "/login" && error.response?.status === 401) {
                 forceLogout();
             }
 
