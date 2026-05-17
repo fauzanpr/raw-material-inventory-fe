@@ -72,7 +72,7 @@ function RawMaterial() {
                         <TableCustomized
                             columns={columns}
                             rows={RawMaterialMapper(data?.content || [])}
-                            rowsCount={data?.size || 0}
+                            rowsCount={data?.totalElements || 0}
                             onSearch={(value) => setSearch(value)}
                             loading={isFetching}
                             pagination={{
