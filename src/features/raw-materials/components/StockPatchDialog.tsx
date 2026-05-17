@@ -46,8 +46,8 @@ function StockPatchDialog({ data: initialData, onClose, open, type }: TStockPatc
                 queryKey: [QUERY_KEYS.RAW_MATERIALS.INDEX]
             });
         },
-        onError: () => {
-            toast.error("Terjadi Kesalahan");
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Terjadi kesalahan");
         }
     });
 
@@ -74,12 +74,24 @@ function StockPatchDialog({ data: initialData, onClose, open, type }: TStockPatc
                             control={control}
                             name="actualStock"
                             label="Stok Sebenarnya"
+                            rules={{
+                                required: {
+                                    value: type === "opname",
+                                    message: "This field is required"
+                                }
+                            }}
                         />
                     ) : (
                         <InputCustomized
                             control={control}
                             name="quantity"
                             label="Kuantitas"
+                            rules={{
+                                required: {
+                                    value: true,
+                                    message: "This field is required"
+                                }
+                            }}
                         />
                     )}
 

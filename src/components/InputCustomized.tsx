@@ -33,7 +33,7 @@ type TInputCustomized<T extends FieldValues> = {
 }
 
 const renderErrorTypography = (error?: string) => (
-    <Typography className="text-error text-xs">{error}</Typography>
+    <p className="text-red-700 text-xs">{error}</p>
 )
 
 function InputCustomized<T extends FieldValues>({

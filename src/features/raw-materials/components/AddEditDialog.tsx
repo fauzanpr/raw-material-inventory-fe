@@ -49,10 +49,8 @@ function AddEditDialog({ onClose, open, dataInit }: TAddEditDialog) {
             });
             _onClose();
         },
-        onError: (err) => {
-            console.log(err);
-
-            toast.error("Terjadi Kesalahan");
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Terjadi kesalahan");
         }
     });
 
